@@ -8,13 +8,14 @@ import bcrypt from "bcrypt";
  * at the end sends user confirmation if DB save is done successfully
  */
 
-const register = async ({ name, email, password }) => {
+const register = async (req, res) => {
+  const { name, email, password } = req.body;
   //? existing user
   const existingUser = await pool.query(
-    "SELECT id FROM seats WHERE email = $1",
+    "SELECT id FROM users WHERE email = $1",
     [email],
   );
-  if (existingUser.rowCount) {
+  if (existingUser.rowCount > 0) {
     throw new Error("User already exist");
   }
 
@@ -28,7 +29,10 @@ const register = async ({ name, email, password }) => {
     [name, email, passwordHash],
   );
 
-  return results.rows([0]);
+  return res.status(201).json({
+    msg: "Registration completed",
+    data: results.rows[0],
+  });
 };
 
 const login = async ({ email, password }) => {};
