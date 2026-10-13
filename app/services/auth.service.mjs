@@ -1,16 +1,10 @@
 import pool from "../db/pool.mjs";
 import bcrypt from "bcrypt";
 
-/**
- * * Registration
- * check if user exists or not?
- * hash password and save the necessary info inside the DB
- * at the end sends user confirmation if DB save is done successfully
- */
-
 const register = async (req, res) => {
   const { name, email, password } = req.body;
-  //? existing user
+  if (!name || !email || !password) throw new Error("All fields are required");
+
   const existingUser = await pool.query(
     "SELECT id FROM users WHERE email = $1",
     [email],
@@ -35,6 +29,8 @@ const register = async (req, res) => {
   });
 };
 
-const login = async ({ email, password }) => {};
+const login = async (req, body) => {
+  const { email, password } = req.body;
+};
 
-export { register };
+export { register, login };
