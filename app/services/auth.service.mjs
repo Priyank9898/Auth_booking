@@ -1,5 +1,10 @@
 import pool from "../db/pool.mjs";
 import bcrypt from "bcrypt";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../utils/jwt.utils.mjs";
+import { strictObject } from "zod";
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -65,11 +70,42 @@ const login = async (req, res) => {
     });
   }
 
+  // Adding access and refresh token in DB
+  const accessToken = generateAccessToken({
+    id: user.id,
+  });
+
+  const refreshToken = generateRefreshToken({
+    id: user.id,
+    name: user.name,
+  });
+
+  const dbTokenUpdate = await pool.query(
+    `UPDATE users
+    SET access_token = $1,
+        refresh_token = $2
+    WHERE id = $3
+    `,
+    [accessToken, refreshToken, user.id],
+  );
+
+  if (dbTokenUpdate.rowCount === 0)
+    return res.status(400).json({
+      msg: "Access Token and Refresh Token could not be added",
+    });
+
+  res.cookie("refreshToken", accessToken, {
+    httpOnly: true,
+    sameSite: "strict",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
   return res.status(200).json({
     message: `Login successful`,
     user: {
       id: user.id,
       email: user.email,
+      accessToken: accessToken,
     },
   });
 };
