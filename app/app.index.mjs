@@ -10,3 +10,5 @@ app.use(cookieParser());
 app.use("/api/auth", authRoute);
 
 export default app;
+
+// How will booking work?
