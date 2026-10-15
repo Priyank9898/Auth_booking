@@ -28,4 +28,34 @@ const availableSeats = async (req, res) => {
   });
 };
 
-export { availableSeats };
+// We are expecting here that FE will provide the seat that user requires
+const seatBooking = async (req, res) => {
+  const userId = req.user.id;
+  const userName = req.user.name;
+  const seatId = req.params.id;
+
+  let bookingUpdate;
+
+  try {
+    bookingUpdate = await pool.query(
+      `UPDATE seats
+     SET name = $1,
+         isbooked = $2,
+         booked_by_user_id = $3
+     WHERE id = $4`,
+      [userName, 1, userId, seatId],
+    );
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      msg: "Something went wrong",
+    });
+  }
+
+  return res.status(201).json({
+    msg: bookingUpdate,
+    // msg: `Congratulations the seats are booked with id: ${}`,
+  });
+};
+
+export { availableSeats, seatBooking };

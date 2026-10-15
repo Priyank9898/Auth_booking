@@ -47,10 +47,9 @@ const login = async (req, res) => {
     });
   }
 
-  const userLookUp = await pool.query(
-    `SELECT id, email, password_hash FROM users WHERE email = $1`,
-    [email],
-  );
+  const userLookUp = await pool.query(`SELECT * FROM users WHERE email = $1`, [
+    email,
+  ]);
 
   // userLookUp
   if (userLookUp.rowCount === 0) {
