@@ -20,6 +20,7 @@ const authorize = (req, res, next) => {
 
   req.user = {
     id: decode.id,
+    name: decode.name,
   };
 
   next();

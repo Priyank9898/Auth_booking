@@ -73,11 +73,11 @@ const login = async (req, res) => {
   // Adding access and refresh token in DB
   const accessToken = generateAccessToken({
     id: user.id,
+    name: user.name,
   });
 
   const refreshToken = generateRefreshToken({
     id: user.id,
-    name: user.name,
   });
 
   const dbTokenUpdate = await pool.query(
